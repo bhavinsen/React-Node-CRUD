@@ -28,7 +28,7 @@ const createSchema = async (req, res, next) => {
 // Find Data API
 const getSchema = async (req, res, next) => {
   try {
-    const data = await Model.find();
+    const data = await Model.find()
     return res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);

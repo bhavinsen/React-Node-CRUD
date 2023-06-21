@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
+import { Dialog, Transition } from '@headlessui/react'
+import React, { useContext, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { Fragment, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import axios from "axios";
-import { toast } from "react-toastify";
-import URL from "../URL";
+import { Fragment } from "react";
+import GlobalContext from "../contexts/GlobalContext";
 
-const CustomerForm = ({ open, setOpen, fetchData, editData, setEditData }) => {
+const CustomerForm = ({ editData, setEditData }) => {
+  const { handleCreateData, handleEditData, open, setOpen } =
+    useContext(GlobalContext);
   // Formik schema
   const validateForm = (values) => {
     const errors = {};
@@ -32,73 +32,14 @@ const CustomerForm = ({ open, setOpen, fetchData, editData, setEditData }) => {
   // Handle edit and create data function
   const handleSubmit = (values) => {
     if (editData === undefined) {
-      handleCreate(values);
+      handleCreateData(values);
       return;
     }
     if (editData._id) {
-      handleEdit(values);
+      handleEditData(editData._id, values);
       return;
     }
   };
-  // Create new Data
-  const handleCreate = async (values) => {
-    await axios
-      .post(`${URL}/addcontact`, values)
-      .then((result) => {
-        if (result.status === 200) {
-          toast(result?.data.message, {
-            hideProgressBar: true,
-            autoClose: 3000,
-            type: "success",
-          });
-          fetchData();
-          setOpen(false);
-        } else {
-          toast(result?.message, {
-            hideProgressBar: true,
-            autoClose: 3000,
-            type: "error",
-          });
-        }
-      })
-      .catch((err) => {
-        toast(err?.response?.data?.message || err?.message, {
-          hideProgressBar: true,
-          autoClose: 3000,
-          type: "error",
-        });
-      });
-  };
-  // Edit data
-  const handleEdit = async (values) => {
-    await axios
-      .put(`${URL}/updatecontact/${editData._id}`, values)
-      .then((result) => {
-        if (result.status === 200) {
-          toast(result?.data.message, {
-            hideProgressBar: true,
-            autoClose: 3000,
-            type: "success",
-          });
-          fetchData();
-          setOpen(false);
-        } else {
-          toast(result?.message, {
-            hideProgressBar: true,
-            autoClose: 3000,
-            type: "error",
-          });
-        }
-      })
-      .catch((err) => {
-        toast(err?.response?.data?.message || err?.message, {
-          hideProgressBar: true,
-          autoClose: 3000,
-          type: "error",
-        });
-      });
-  };
-
   // Handle Edit data state
   useEffect(() => {
     if (!open) {
